@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaipur SafeTrip - Your AI-Powered Travel Guide</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation Styles */
+        .navbar {
+            background: linear-gradient(135deg, #FCD34D, #F59E0B);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar.scrolled {
+            background: rgba(252, 211, 77, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1F2937;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+        
+        .nav-links a {
+            color: #1F2937;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: #374151;
+            transform: translateY(-2px);
+        }
+        
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: #374151;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+
+        .weather-widget {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.1), rgba(255, 165, 0, 0.1), rgba(255, 105, 180, 0.1));
+            animation: colorShift 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes colorShift {
+            0% { opacity: 0.1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 0.1; }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-content h1 {
+            font-size: 6rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #ff6b6b, #ffa500, #ff69b4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
+        }
+        
+        .hero-content p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .explore-btn {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .explore-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        /* Section Styles */
+        .section {
+            padding: 80px 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .section-content {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+        
+        .section-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .section-image {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .section h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+        
+        .section p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        
+        /* Tourist Places Section */
+        .tourist-places {
+            background: linear-gradient(135deg, #A7F3D0, #6EE7B7);
+            color: #1F2937;
+        }
+
+        /* Image Gallery Styles */
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+        
+        .image-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+        }
+        
+        .image-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .image-card:hover img {
+            transform: scale(1.05);
+        }
+        
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 30px 20px 20px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .image-card:hover .card-overlay {
+            transform: translateY(0);
+        }
+
+        .card-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .card-info h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1F2937;
+        }
+
+        .card-info p {
+            color: #6B7280;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .rating {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .rating .star {
+            color: #FCD34D;
+        }
+        
+        /* Heritage Hotels Section */
+        .heritage-hotels {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
+        }
+        
+        /* Famous Food Section */
+        .famous-food {
+            background: linear-gradient(135deg, #FDE047, #F59E0B);
+            color: #1F2937;
+        }
+
+        /* Food Grid */
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .food-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        .food-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .food-info {
+            padding: 20px;
+        }
+
+        .food-info h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1F2937;
+        }
+
+        .food-info p {
+            color: #6B7280;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .price-tag {
+            background: #10B981;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        /* Itinerary Section */
+        .itinerary-section {
+            background: linear-gradient(135deg, #F97316, #EA580C);
+            color: white;
+            text-align: center;
+        }
+        
+        .interest-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+        
+        .interest-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .interest-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+        }
+        
+        .interest-card.selected {
+            border: 4px solid #10B981;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .interest-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .card-content {
+            padding: 20px;
+            text-align: center;
+            color: #1F2937;
+        }
+        
+        .card-content h3 {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .card-content p {
+            font-size: 0.9rem;
+            color: #6B7280;
+            margin-bottom: 15px;
+        }
+        
+        .card-tag {
+            background: #F3F4F6;
+            color: #6B7280;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+
+        .trip-preferences {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .preference-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .preference-card label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .preference-card select, .preference-card input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background: white;
+            color: #1F2937;
+            font-size: 16px;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+        }
+        
+        .generate-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 40px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Itinerary Result Styles */
+        .itinerary-result {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: left;
+        }
+        
+        .itinerary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .export-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .export-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Chat Assistant Styles */
+        .chat-section {
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            color: white;
+        }
+        
+        .chat-container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .message.bot {
+            background: rgba(16, 185, 129, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #10B981;
+        }
+        
+        .message.user {
+            background: rgba(59, 130, 246, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3B82F6;
+            margin-left: 20px;
+        }
+        
+        .message-header {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.9);
+            color: #1F2937;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* Quick Questions */
+        .quick-questions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-question {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-question:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+
+        .modal-content {
+            position: relative;
+            margin: auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: white;
+        }
+
+        /* Statistics Section */
+        .stats-section {
+            background: linear-gradient(135deg, #1F2937, #374151);
+            color: white;
+            padding: 80px 20px;
+        }
+
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 30px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #FCD34D;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: linear-gradient(135deg, #059669, #10B981);
+            color: white;
+            padding: 80px 20px;
+        }
+
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.9);
+            color: #1F2937;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #F59E0B, #FCD34D);
+            color: #1F2937;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero-content h1 {
+                font-size: 3rem;
+            }
+            
+            .section-content {
+                flex-direction: column;
+                gap: 40px;
+            }
+            
+            .interest-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .export-buttons {
+                justify-content: center;
+            }
+
+            .weather-widget {
+                display: none;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                gap: 15px;
+            }
+            
+            .nav-links a {
+                font-size: 14px;
+            }
+        }
+        
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Scrollbar Styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #F59E0B, #FCD34D);
+            color: #1F2937;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(100px);
+        }
+
+        .scroll-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#home" class="logo">🏰 Jaipur SafeTrip</a>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#tourist-places">Places</a>
+                <a href="#heritage-hotels">Hotels</a>
+                <a href="#famous-food">Food</a>
+                <a href="#itinerary">AI Planner</a>
+                <a href="#chat">Assistant</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="weather-widget" id="weather-widget">
+                <i class="fas fa-sun"></i>
+                <span id="weather-info">Loading...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>पधारो म्हारे देश</h1>
+            <p>Padharo Mhare Desh - Welcome to the Pink City</p>
+            <a href="#itinerary" class="explore-btn">🤖 Explore Jaipur</a>
+        </div>
+    </section>
+
+    <!-- Famous Tourist Places -->
+    <section id="tourist-places" class="section tourist-places">
+        <div class="section-container">
+            <div class="section-content">
+                <div class="section-text">
+                    <h2>🏰 FAMOUS TOURIST PLACES</h2>
+                    <p>Planned by Vidyadhar Bhattacharya, Jaipur holds the distinction of being the first planned city of India. Renowned globally for its coloured gems, the capital city of Rajasthan combines the allure of its ancient history with all the advantages of a metropolis.</p>
+                    <p>The story goes that in 1876, the Prince of Wales visited India on a tour. Since the colour pink was symbolic of hospitality, Maharaja Ram Singh of Jaipur painted the entire city pink. The pink that colours the city makes for a marvellous spectacle to behold.</p>
+                    <a href="#itinerary" class="explore-btn" style="background: rgba(0,0,0,0.1); color: #1F2937; border-color: rgba(0,0,0,0.2);">Plan Your Visit</a>
+                </div>
+            </div>
+            
+            <div class="image-gallery">
+                <div class="image-card" onclick="openModal('https://images.unsplash.com/photo-1599661046827-dacde6976549?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1599661046827-dacde6976549?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Amber Fort">
+                    <div class="card-info">
+                        <h3>🏰 Amber Fort</h3>
+                        <div class="rating">
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                        </div>
+                        <p>Magnificent 16th-century fort with stunning Rajput architecture and panoramic views</p>
+                    </div>
+                </div>
+                
+                <div class="image-card" onclick="openModal('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hawa Mahal">
+                    <div class="card-info">
+                        <h3>🌸 Hawa Mahal</h3>
+                        <div class="rating">
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                        </div>
+                        <p>Palace of Winds with 953 windows, iconic pink sandstone facade</p>
+                    </div>
+                </div>
+                
+                <div class="image-card" onclick="openModal('https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="City Palace">
+                    <div class="card-info">
+                        <h3>🏛️ City Palace</h3>
+                        <div class="rating">
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                        </div>
+                        <p>Royal residence complex with museums, courtyards, and gardens</p>
+                    </div>
+                </div>
+                
+                <div class="image-card" onclick="openModal('https://images.unsplash.com/photo-1609920658906-8223bd289001?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1609920658906-8223bd289001?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Jantar Mantar">
+                    <div class="card-info">
+                        <h3>🔭 Jantar Mantar</h3>
+                        <div class="rating">
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                        </div>
+                        <p>UNESCO World Heritage astronomical observatory with 19 instruments</p>
+                    </div>
+                </div>
+                
+                <div class="image-card" onclick="openModal('https://images.unsplash.com/photo-1571043733612-d5444ff2a4a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1571043733612-d5444ff2a4a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Nahargarh Fort">
+                    <div class="card-info">
+                        <h3>🌅 Nahargarh Fort</h3>
+                        <div class="rating">
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                        </div>
+                        <p>Tiger Fort offering spectacular sunset views over Jaipur city</p>
+                    </div>
+                </div>
+                
+                <div class="image-card" onclick="openModal('https://images.unsplash.com/photo-1512632578888-169bbbc64f33?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1512632578888-169bbbc64f33?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Jal Mahal">
+                    <div class="card-info">
+                        <h3>🏰 Jal Mahal</h3>
+                        <div class="rating">
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                        </div>
+                        <p>Water Palace floating in the middle of Man Sagar Lake</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Heritage Hotels -->
+    <section id="heritage-hotels" class="section heritage-hotels">
+        <div class="section-container">
+            <div class="section-content">
+                <div class="section-text">
+                    <h2>🏛️ HERITAGE HOTELS</h2>
+                    <p>Experience royal living in Jaipur's magnificent heritage hotels. These former palaces and havelis have been converted into luxury accommodations, offering guests a chance to live like maharajas while enjoying modern amenities.</p>
+                    <p>From the opulent Rambagh Palace to the charming Samode Haveli, each heritage hotel tells a story of Rajasthan's glorious past while providing world-class hospitality.</p>
+                    <a href="#itinerary" class="explore-btn">Book Your Stay</a>
+                </div>
+            </div>
+            
+            <div class="image-gallery">
+                <div class="image-card" onclick="openModal('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Rambagh Palace">
+                    <div class="card-info">
+                        <h3>👑 Rambagh Palace</h3>
+                        <div class="rating">
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                        </div>
+                        <p>Former royal residence, now a luxury Taj Palace hotel</p>
+                    </div>
+                </div>
+                
+                <div class="image-card" onclick="openModal('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Samode Palace">
+                    <div class="card-info">
+                        <h3>🏰 Samode Palace</h3>
+                        <div class="rating">
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                        </div>
+                        <p>475-year-old palace with stunning mirror work and frescoes</p>
+                    </div>
+                </div>
+                
+                <div class="image-card" onclick="openModal('https://images.unsplash.com/photo-1615460549969-36fa19521a4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1615460549969-36fa19521a4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Umaid Bhawan">
+                    <div class="card-info">
+                        <h3>🌟 Raj Palace</h3>
+                        <div class="rating">
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                        </div>
+                        <p>World's largest palace complex, now a heritage hotel</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Famous Food -->
+    <section id="famous-food" class="section famous-food">
+        <div class="section-container">
+            <div class="section-content">
+                <div class="section-text">
+                    <h2>🥘 FAMOUS RAJASTHANI CUISINE</h2>
+                    <p>Indulge in the rich and flavorful cuisine of Rajasthan. From the iconic Dal Baati Churma to the sweet delights of Ghevar, Jaipur offers a culinary journey that reflects the royal heritage and desert culture of the region.</p>
+                    <p>Experience authentic flavors at traditional restaurants, street food markets, and royal dining experiences that have been perfected over centuries.</p>
+                    <a href="#itinerary" class="explore-btn" style="background: rgba(0,0,0,0.1); color: #1F2937; border-color: rgba(0,0,0,0.2);">Explore Food Tours</a>
+                </div>
+            </div>
+            
+            <div class="food-grid">
+                <div class="food-card">
+                    <img src="https://images.unsplash.com/photo-1596797038530-2c107229654b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Dal Baati Churma">
+                    <div class="food-info">
+                        <h4>🥘 Dal Baati Churma</h4>
+                        <p>Traditional Rajasthani delicacy with lentil curry, wheat balls, and sweet crumble</p>
+                        <span class="price-tag">₹150-300</span>
+                    </div>
+                </div>
+                
+                <div class="food-card">
+                    <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Laal Maas">
+                    <div class="food-info">
+                        <h4>🌶️ Laal Maas</h4>
+                        <p>Spicy red meat curry, a royal delicacy of Rajasthan</p>
+                        <span class="price-tag">₹400-600</span>
+                    </div>
+                </div>
+                
+                <div class="food-card">
+                    <img src="https://images.unsplash.com/photo-1589301760014-d929f3979dbc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Ghevar">
+                    <div class="food-info">
+                        <h4>🍯 Ghevar</h4>
+                        <p>Disc-shaped sweet cake soaked in sugar syrup, perfect for festivals</p>
+                        <span class="price-tag">₹200-400</span>
+                    </div>
+                </div>
+                
+                <div class="food-card">
+                    <img src="https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Pyaaz Kachori">
+                    <div class="food-info">
+                        <h4>🥟 Pyaaz Kachori</h4>
+                        <p>Deep-fried pastry stuffed with spiced onion filling</p>
+                        <span class="price-tag">₹20-50</span>
+                    </div>
+                </div>
+                
+                <div class="food-card">
+                    <img src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Rajasthani Thali">
+                    <div class="food-info">
+                        <h4>🍽️ Rajasthani Thali</h4>
+                        <p>Complete meal with variety of curries, bread, rice, and desserts</p>
+                        <span class="price-tag">₹300-800</span>
+                    </div>
+                </div>
+                
+                <div class="food-card">
+                    <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Lassi">
+                    <div class="food-info">
+                        <h4>🥛 Makhaniya Lassi</h4>
+                        <p>Thick, creamy yogurt drink topped with malai and dry fruits</p>
+                        <span class="price-tag">₹80-150</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-number" data-count="50000">0</span>
+                <span class="stat-label">Happy Travelers</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-count="300">0</span>
+                <span class="stat-label">Years of History</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-count="25">0</span>
+                <span class="stat-label">Major Attractions</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-count="100">0</span>
+                <span class="stat-label">Heritage Hotels</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Itinerary Maker -->
+    <section id="itinerary" class="section itinerary-section">
+        <div class="section-container">
+            <h2 style="margin-bottom: 20px;">🤖 AI-Powered Trip Planner</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 40px; opacity: 0.9;">Select your preferences and let our AI create a personalized itinerary just for you</p>
+            
+            <!-- Trip Preferences -->
+            <div class="trip-preferences">
+                <div class="preference-card">
+                    <label>📅 Trip Duration</label>
+                    <select id="trip-duration">
+                        <option value="1">1 Day</option>
+                        <option value="2" selected>2 Days</option>
+                        <option value="3">3 Days</option>
+                        <option value="4">4 Days</option>
+                        <option value="5">5 Days</option>
+                    </select>
+                </div>
+                <div class="preference-card">
+                    <label>💰 Budget Range</label>
+                    <select id="budget-range">
+                        <option value="budget">Budget (₹2,000-5,000/day)</option>
+                        <option value="mid-range" selected>Mid-Range (₹5,000-10,000/day)</option>
+                        <option value="luxury">Luxury (₹10,000+/day)</option>
+                    </select>
+                </div>
+                <div class="preference-card">
+                    <label>👥 Group Size</label>
+                    <select id="group-size">
+                        <option value="solo">Solo Traveler</option>
+                        <option value="couple" selected>Couple</option>
+                        <option value="family">Family (3-5 people)</option>
+                        <option value="group">Group (6+ people)</option>
+                    </select>
+                </div>
+                <div class="preference-card">
+                    <label>🏨 Accommodation Type</label>
+                    <select id="accommodation">
+                        <option value="budget">Budget Hotels</option>
+                        <option value="mid-range" selected>Mid-Range Hotels</option>
+                        <option value="heritage">Heritage Hotels</option>
+                        <option value="luxury">Luxury Resorts</option>
+                    </select>
+                </div>
+            </div>
+
+            <h3 style="font-size: 1.5rem; margin-bottom: 30px;">Choose Your Interests:</h3>
+            
+            <div class="interest-cards">
+                <div class="interest-card" onclick="toggleCard(this)" data-interest="Heritage Hotels">
+                    <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Heritage Hotels">
+                    <div class="card-content">
+                        <h3>🏛️ HERITAGE HOTELS</h3>
+                        <p>Stay in royal palaces turned luxury hotels</p>
+                        <span class="card-tag">Luxury Experience</span>
+                    </div>
+                </div>
+                
+                <div class="interest-card" onclick="toggleCard(this)" data-interest="Famous Food">
+                    <img src="https://images.unsplash.com/photo-1596797038530-2c107229654b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Famous Food">
+                    <div class="card-content">
+                        <h3>🥘 RAJASTHANI CUISINE</h3>
+                        <p>Authentic local food and culinary experiences</p>
+                        <span class="card-tag">Food Tours</span>
+                    </div>
+                </div>
+                
+                <div class="interest-card" onclick="toggleCard(this)" data-interest="Famous Places">
+                    <img src="https://images.unsplash.com/photo-1599661046827-dacde6976549?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Famous Places">
+                    <div class="card-content">
+                        <h3>🏰 HISTORICAL MONUMENTS</h3>
+                        <p>Explore forts, palaces, and UNESCO sites</p>
+                        <span class="card-tag">Cultural Heritage</span>
+                    </div>
+                </div>
+                
+                <div class="interest-card" onclick="toggleCard(this)" data-interest="Shopping">
+                    <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Shopping">
+                    <div class="card-content">
+                        <h3>🛍️ SHOPPING & CRAFTS</h3>
+                        <p>Traditional markets, jewelry, and handicrafts</p>
+                        <span class="card-tag">Local Markets</span>
+                    </div>
+                </div>
+                
+                <div class="interest-card" onclick="toggleCard(this)" data-interest="Adventure">
+                    <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Adventure">
+                    <div class="card-content">
+                        <h3>🐘 ADVENTURE ACTIVITIES</h3>
+                        <p>Elephant rides, hot air balloons, desert safaris</p>
+                        <span class="card-tag">Outdoor Fun</span>
+                    </div>
+                </div>
+                
+                <div class="interest-card" onclick="toggleCard(this)" data-interest="Wellness">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Wellness">
+                    <div class="card-content">
+                        <h3>🧘 WELLNESS & SPA</h3>
+                        <p>Ayurvedic treatments and relaxation</p>
+                        <span class="card-tag">Rejuvenation</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="generate-btn" onclick="generateItinerary()">
+                🚀 Create My Perfect Itinerary
+            </button>
+
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="loading hidden">
+                <div class="spinner"></div>
+                <p style="font-size: 1.2rem;">🤖 AI is crafting your perfect Jaipur experience...</p>
+            </div>
+
+            <!-- Itinerary Result -->
+            <div id="itinerary-result" class="itinerary-result hidden">
+                <div class="itinerary-header">
+                    <h3 style="font-size: 2rem; margin: 0;">🌟 Your Personalized Jaipur Itinerary</h3>
+                    <div class="export-buttons">
+                        <button class="export-btn" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                        <button class="export-btn" onclick="exportToJSON()"><i class="fas fa-download"></i> Save Offline</button>
+                        <button class="export-btn" onclick="shareItinerary()"><i class="fas fa-share"></i> Share</button>
+                    </div>
+                </div>
+                <div id="itinerary-content">
+                    <!-- Generated itinerary content will appear here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Chat Assistant -->
+    <section id="chat" class="section chat-section">
+        <div class="section-container">
+            <h2 style="text-align: center; margin-bottom: 20px;">💬 Ask Jaipur Dost - Your AI Travel Assistant</h2>
+            <p style="text-align: center; font-size: 1.1rem; margin-bottom: 40px; opacity: 0.9;">Get instant answers about Jaipur travel, attractions, food, and local tips</p>
+            
+            <div class="chat-container">
+                <div class="quick-questions">
+                    <div class="quick-question" onclick="askQuickQuestion('Best time to visit Jaipur?')">🌤️ Best time to visit?</div>
+                    <div class="quick-question" onclick="askQuickQuestion('How to reach Amber Fort?')">🏰 How to reach Amber Fort?</div>
+                    <div class="quick-question" onclick="askQuickQuestion('Best local food in Jaipur?')">🥘 Best local food?</div>
+                    <div class="quick-question" onclick="askQuickQuestion('Shopping places in Jaipur?')">🛍️ Shopping places?</div>
+                    <div class="quick-question" onclick="askQuickQuestion('Budget for 3 days in Jaipur?')">💰 Budget planning?</div>
+                </div>
+                
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message bot">
+                        <div class="message-header">🤖 Jaipur Dost</div>
+                        <div>Namaste! Welcome to Jaipur! I'm your AI travel assistant. Ask me anything about the Pink City - from the best places to visit, local food recommendations, to travel tips and safety advice. How can I help make your Jaipur experience unforgettable?</div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Ask about Jaipur attractions, food, hotels, or travel tips..." onkeypress="handleChatKeyPress(event)">
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="section-container">
+            <h2 style="text-align: center; margin-bottom: 20px;">📞 Contact Us</h2>
+            <p style="text-align: center; font-size: 1.1rem; margin-bottom: 40px; opacity: 0.9;">Plan your perfect Jaipur trip with our expert travel consultants</p>
+            
+            <div class="contact-form">
+                <form id="contact-form" onsubmit="submitContactForm(event)">
+                    <div class="form-group">
+                        <label for="name">👤 Full Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">📧 Email Address</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">📱 Phone Number</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="travel-dates">📅 Preferred Travel Dates</label>
+                        <input type="text" id="travel-dates" name="travel-dates" placeholder="e.g., December 2024">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">💬 Tell us about your travel plans</label>
+                        <textarea id="message" name="message" placeholder="Number of travelers, interests, special requirements, etc." required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Send Inquiry
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for Image Zoom -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <img id="modal-image" src="" alt="">
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Global variables
+        let selectedInterests = new Set();
+        let chatHistory = [];
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            const scrollTop = document.getElementById('scrollTop');
+            
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+                scrollTop.classList.add('show');
+            } else {
+                navbar.classList.remove('scrolled');
+                scrollTop.classList.remove('show');
+            }
+        });
+
+        // Weather widget (mock data - in real implementation, use weather API)
+        function updateWeather() {
+            const weatherInfo = document.getElementById('weather-info');
+            const temp = Math.floor(Math.random() * 10) + 25; // Random temp between 25-35°C
+            weatherInfo.textContent = `${temp}°C Jaipur`;
+        }
+        updateWeather();
+        setInterval(updateWeather, 300000); // Update every 5 minutes
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Statistics counter animation
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-count'));
+                const duration = 2000; // 2 seconds
+                const step = target / (duration / 16); // 60fps
+                let current = 0;
+                
+                const timer = setInterval(() => {
+                    current += step;
+                    if (current >= target) {
+                        counter.textContent = target.toLocaleString();
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.floor(current).toLocaleString();
+                    }
+                }, 16);
+            });
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (entry.target.classList.contains('stats-section')) {
+                        animateCounters();
+                    }
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe sections for animations
+        document.querySelectorAll('.section, .stats-section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Modal functions
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modal-image');
+            modal.style.display = 'block';
+            modalImage.src = imageSrc;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside the image
+        window.onclick = function(event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Scroll to top function
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Interest card toggle function
+        function toggleCard(cardElement) {
+            const interest = cardElement.dataset.interest;
+            
+            if (selectedInterests.has(interest)) {
+                selectedInterests.delete(interest);
+                cardElement.classList.remove('selected');
+            } else {
+                selectedInterests.add(interest);
+                cardElement.classList.add('selected');
+            }
+        }
+
+        // Generate itinerary function
+        async function generateItinerary() {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const itineraryResult = document.getElementById('itinerary-result');
+            const itineraryContent = document.getElementById('itinerary-content');
+            
+            // Show loading indicator
+            loadingIndicator.classList.remove('hidden');
+            itineraryResult.classList.add('hidden');
+
+            // Check if user has selected any interests
+            if (selectedInterests.size === 0) {
+                alert('Please select at least one interest before generating an itinerary!');
+                loadingIndicator.classList.add('hidden');
+                return;
+            }
+
+            // Get user preferences
+            const duration = document.getElementById('trip-duration').value;
+            const budget = document.getElementById('budget-range').value;
+            const groupSize = document.getElementById('group-size').value;
+            const accommodation = document.getElementById('accommodation').value;
+            const interests = Array.from(selectedInterests);
+
+            // Simulate AI processing time
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            // Generate comprehensive itinerary
+            const itinerary = generateComprehensiveItinerary(duration, budget, groupSize, accommodation, interests);
+            
+            // Hide loading and show result
+            loadingIndicator.classList.add('hidden');
+            itineraryResult.classList.remove('hidden');
+            itineraryContent.innerHTML = itinerary;
+
+            // Scroll to result
+            itineraryResult.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }
+
+        // Generate comprehensive itinerary based on preferences
+        function generateComprehensiveItinerary(duration, budget, groupSize, accommodation, interests) {
+            const budgetRanges = {
+                'budget': { min: 2000, max: 5000, hotels: 'Budget hotels & guesthouses', food: 'Local eateries & street food' },
+                'mid-range': { min: 5000, max: 10000, hotels: '3-4 star hotels', food: 'Good restaurants & cafes' },
+                'luxury': { min: 10000, max: 25000, hotels: 'Heritage hotels & luxury resorts', food: 'Fine dining & royal experiences' }
+            };
+
+            const currentBudget = budgetRanges[budget];
+            const totalBudget = currentBudget.max * parseInt(duration);
+
+            let itineraryHTML = `
+                <div class="bg-white bg-opacity-10 rounded-lg p-6 mb-6">
+                    <h4 class="text-xl font-bold mb-4">📋 Trip Overview</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div><strong>Duration:</strong> ${duration} Day${duration > 1 ? 's' : ''}</div>
+                        <div><strong>Budget:</strong> ${budget.charAt(0).toUpperCase() + budget.slice(1)} (₹${currentBudget.min.toLocaleString()}-${currentBudget.max.toLocaleString()}/day)</div>
+                        <div><strong>Group Size:</strong> ${groupSize.charAt(0).toUpperCase() + groupSize.slice(1)}</div>
+                        <div><strong>Total Budget:</strong> ₹${totalBudget.toLocaleString()}</div>
+                        <div><strong>Accommodation:</strong> ${currentBudget.hotels}</div>
+                        <div><strong>Dining:</strong> ${currentBudget.food}</div>
+                    </div>
+                </div>
+            `;
+
+            // Generate day-by-day itinerary
+            for (let day = 1; day <= parseInt(duration); day++) {
+                itineraryHTML += generateDayItinerary(day, interests, budget, duration);
+            }
+
+            // Add safety tips and practical information
+            itineraryHTML += `
+                <div class="bg-green-500 bg-opacity-20 rounded-lg p-6 mt-6">
+                    <h4 class="text-xl font-bold mb-4">💡 Safety & Insider Tips</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><strong>Best Time to Visit:</strong> October to March for pleasant weather</li>
+                        <li><strong>Local Transport:</strong> Use Ola/Uber or pre-paid auto-rickshaws. Negotiate prices beforehand</li>
+                        <li><strong>Bargaining:</strong> Start at 30-40% of quoted price in markets</li>
+                        <li><strong>Safety:</strong> Keep valuables secure, avoid isolated areas after dark</li>
+                        <li><strong>Dress Code:</strong> Modest clothing for temples and palaces</li>
+                        <li><strong>Water:</strong> Drink only bottled water, avoid ice in street food</li>
+                        <li><strong>Emergency:</strong> Tourist Helpline: 1363, Police: 100</li>
+                        <li><strong>Currency:</strong> Carry cash as many places don't accept cards</li>
+                    </ul>
+                </div>
+
+                <div class="bg-blue-500 bg-opacity-20 rounded-lg p-6 mt-6">
+                    <h4 class="text-xl font-bold mb-4">📱 Useful Apps & Contacts</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <strong>Transportation:</strong><br>
+                            • Ola/Uber for cabs<br>
+                            • RSRTC for buses<br>
+                            • Goibibo/MakeMyTrip for bookings
+                        </div>
+                        <div>
+                            <strong>Food & Reviews:</strong><br>
+                            • Zomato/Swiggy for food delivery<br>
+                            • TripAdvisor for reviews<br>
+                            • Google Maps for navigation
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return itineraryHTML;
+        }
+
+        // Generate day-specific itinerary
+        function generateDayItinerary(day, interests, budget, totalDays) {
+            const dayPlans = {
+                1: {
+                    morning: { place: 'Amber Fort', time: '9:00 AM', activity: 'Explore the magnificent fort, elephant ride optional', cost: '₹500-1100' },
+                    afternoon: { place: 'Jaigarh Fort', time: '1:00 PM', activity: 'Visit the world\'s largest cannon, lunch with fort views', cost: '₹300-800' },
+                    evening: { place: 'Nahargarh Fort', time: '5:00 PM', activity: 'Sunset views over Pink City', cost: '₹200-500' }
+                },
+                2: {
+                    morning: { place: 'City Palace', time: '9:00 AM', activity: 'Royal residence tour, museums, courtyards', cost: '₹700-1200' },
+                    afternoon: { place: 'Jantar Mantar', time: '12:00 PM', activity: 'UNESCO World Heritage astronomical observatory', cost: '₹200-400' },
+                    evening: { place: 'Hawa Mahal & Markets', time: '4:00 PM', activity: 'Palace of Winds, shopping in Johari Bazaar', cost: '₹300-1000' }
+                },
+                3: {
+                    morning: { place: 'Jal Mahal', time: '9:00 AM', activity: 'Water Palace photography, boat ride', cost: '₹200-600' },
+                    afternoon: { place: 'Albert Hall Museum', time: '1:00 PM', activity: 'Art and artifacts, architecture tour', cost: '₹300-500' },
+                    evening: { place: 'Chokhi Dhani', time: '6:00 PM', activity: 'Cultural village, traditional dinner', cost: '₹800-1500' }
+                }
+            };
+
+            const plan = dayPlans[day] || dayPlans[1];
+            
+            return `
+                <div class="bg-white bg-opacity-10 rounded-lg p-6 mb-6">
+                    <h4 class="text-xl font-bold mb-4">📅 Day ${day}</h4>
+                    <div class="space-y-4">
+                        <div class="border-l-4 border-yellow-400 pl-4">
+                            <h5 class="font-bold text-lg">🌅 Morning - ${plan.morning.place}</h5>
+                            <p class="text-sm opacity-90 mb-2"><strong>Time:</strong> ${plan.morning.time}</p>
+                            <p class="mb-2">${plan.morning.activity}</p>
+                            <p class="text-yellow-200"><strong>💡 Cost:</strong> ${plan.morning.cost}</p>
+                        </div>
+                        
+                        <div class="border-l-4 border-orange-400 pl-4">
+                            <h5 class="font-bold text-lg">☀️ Afternoon - ${plan.afternoon.place}</h5>
+                            <p class="text-sm opacity-90 mb-2"><strong>Time:</strong> ${plan.afternoon.time}</p>
+                            <p class="mb-2">${plan.afternoon.activity}</p>
+                            <p class="text-yellow-200"><strong>💡 Cost:</strong> ${plan.afternoon.cost}</p>
+                        </div>
+                        
+                        <div class="border-l-4 border-red-400 pl-4">
+                            <h5 class="font-bold text-lg">🌆 Evening - ${plan.evening.place}</h5>
+                            <p class="text-sm opacity-90 mb-2"><strong>Time:</strong> ${plan.evening.time}</p>
+                            <p class="mb-2">${plan.evening.activity}</p>
+                            <p class="text-yellow-200"><strong>💡 Cost:</strong> ${plan.evening.cost}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Export functions
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(20);
+            doc.text('Your Jaipur Itinerary', 20, 30);
+            
+            const content = document.getElementById('itinerary-content').innerText;
+            const lines = doc.splitTextToSize(content, 170);
+            
+            doc.setFontSize(10);
+            doc.text(lines, 20, 50);
+            
+            doc.save('jaipur-itinerary.pdf');
+        }
+
+        function exportToJSON() {
+            const itineraryData = {
+                destination: 'Jaipur',
+                duration: document.getElementById('trip-duration').value,
+                budget: document.getElementById('budget-range').value,
+                interests: Array.from(selectedInterests),
+                generated: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(itineraryData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'jaipur-itinerary.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function shareItinerary() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Jaipur Itinerary',
+                    text: 'Check out my personalized Jaipur travel itinerary!',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback to copying URL
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert('Link copied to clipboard!');
+                });
+            }
+        }
+
+        // Chat functions
+        function askQuickQuestion(question) {
+            document.getElementById('chat-input').value = question;
+            sendMessage();
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const chatInput = document.getElementById('chat-input');
+            const message = chatInput.value.trim();
+            
+            if (!message) return;
+            
+            const chatMessages = document.getElementById('chat-messages');
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.innerHTML = `
+                <div class="message-header">👤 You</div>
+                <div>${message}</div>
+            `;
+            chatMessages.appendChild(userMessage);
+            
+            // Clear input
+            chatInput.value = '';
+            
+            // Simulate bot response
+            setTimeout(() => {
+                const botResponse = generateBotResponse(message);
+                const botMessage = document.createElement('div');
+                botMessage.className = 'message bot';
+                botMessage.innerHTML = `
+                    <div class="message-header">🤖 Jaipur Dost</div>
+                    <div>${botResponse}</div>
+                `;
+                chatMessages.appendChild(botMessage);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function generateBotResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('time') && lowerMessage.includes('visit')) {
+                return "🌤️ The best time to visit Jaipur is from October to March when the weather is pleasant. Avoid summer months (April-June) as temperatures can reach 45°C. Winter months offer perfect weather for sightseeing!";
+            }
+            
+            if (lowerMessage.includes('amber fort') || lowerMessage.includes('reach')) {
+                return "🏰 To reach Amber Fort: Take an auto-rickshaw (₹300-400), taxi (₹500-700), or bus from Jaipur city. The fort is 11km from the city center. You can also take an elephant ride up to the fort (₹1,100 per person) or a jeep ride (₹400-500). Best time to visit is early morning to avoid crowds!";
+            }
+            
+            if (lowerMessage.includes('food') || lowerMessage.includes('eat')) {
+                return "🥘 Must-try Jaipur foods:<br>• Dal Baati Churma - Traditional Rajasthani meal<br>• Pyaaz Kachori - Spicy onion pastry<br>• Laal Maas - Spicy red meat curry<br>• Ghevar - Festival sweet<br>• Makhaniya Lassi - Creamy yogurt drink<br><br>Best places: Laxmi Mishthan Bhandar, Rawat Mishthan Bhandar, Chokhi Dhani for authentic experience!";
+            }
+            
+            if (lowerMessage.includes('shop') || lowerMessage.includes('market')) {
+                return "🛍️ Best shopping places in Jaipur:<br>• Johari Bazaar - Jewelry and gems<br>• Bapu Bazaar - Textiles and handicrafts<br>• Tripolia Bazaar - Lac bangles and brassware<br>• Nehru Bazaar - Blue pottery and souvenirs<br>• Pink Square Mall - Modern shopping<br><br>💡 Tip: Always bargain! Start at 30% of quoted price.";
+            }
+            
+            if (lowerMessage.includes('budget') || lowerMessage.includes('cost')) {
+                return "💰 Budget for 3 days in Jaipur:<br><strong>Budget:</strong> ₹6,000-15,000<br><strong>Mid-range:</strong> ₹15,000-30,000<br><strong>Luxury:</strong> ₹30,000+<br><br>Includes accommodation, food, transport, and entry fees. Heritage hotels cost more but offer unique experiences. Street food is cheap and delicious!";
+            }
+            
+            if (lowerMessage.includes('hotel') || lowerMessage.includes('stay')) {
+                return "🏨 Accommodation options:<br><strong>Heritage:</strong> Rambagh Palace, Samode Palace<br><strong>Luxury:</strong> Oberoi Rajvilas, Fairmont<br><strong>Mid-range:</strong> Hotel Pearl Palace, Alsisar Haveli<br><strong>Budget:</strong> Zostel, Hotel Kalyan<br><br>Book heritage hotels for royal experience, but budget options are also comfortable and clean!";
+            }
+            
+            if (lowerMessage.includes('transport') || lowerMessage.includes('travel')) {
+                return "🚗 Getting around Jaipur:<br>• Auto-rickshaws: ₹10-15/km, always negotiate<br>• Ola/Uber: Available and reliable<br>• City buses: ₹10-20, crowded but cheap<br>• Rental car: ₹2,000-3,000/day<br>• Cycle-rickshaws: For short distances<br><br>💡 Tip: Use Ola/Uber for hassle-free travel or negotiate fixed rates with auto drivers.";
+            }
+            
+            // Default response
+            return "I'd be happy to help you with your Jaipur travel questions! You can ask me about:<br>• Best places to visit and timings<br>• Local food and restaurants<br>• Shopping markets and bargaining tips<br>• Transportation and costs<br>• Hotels and accommodation<br>• Safety tips and cultural etiquette<br>• Weather and best time to visit<br><br>What specific information would you like about the Pink City? 🏰";
+        }
+
+        // Contact form submission
+        function submitContactForm(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData);
+            
+            // Simulate form submission
+            const submitBtn = event.target.querySelector('.submit-btn');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                alert('Thank you for your inquiry! We will get back to you within 24 hours with a customized Jaipur travel plan.');
+                event.target.reset();
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 2000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add loading animation to images
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                img.addEventListener('load', function() {
+                    this.style.opacity = '1';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+<style>/* Hero Section */
+.hero {
+    height: 100vh;
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    position: relative;
+}</style>
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px;">What Interests You?</h2>
+                <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9;">Select your interests to customize your Jaipur itinerary</p>
+                
+                <div class="interest-card" onclick="toggleCard(this)" data-interest="Cultural Experiences">
+                    <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Cultural Experiences">
+                    <div class="card-content">
+                        <h3>🎨 CULTURAL EXPERIENCES</h3>
+                        <p>Traditional arts, crafts, and performances</p>
+                        <span class="card-tag">Heritage & Arts</span>
+                    </div>
+                </div>
+                
+                <div class="interest-card" onclick="toggleCard(this)" data-interest="Culinary Experiences">
+                    <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Culinary Experiences">
+                    <div class="card-content">
+                        <h3>🍲 CULINARY EXPERIENCES</h3>
+                        <p>Rajasthani cuisine, street food tours, cooking classes</p>
+                        <span class="card-tag">Food & Drink</span>
+                    </div>
+                </div>      

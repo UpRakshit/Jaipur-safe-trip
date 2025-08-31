@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaipur SafeTrip - Your AI-Powered Travel Guide</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation Styles */
+        .navbar {
+            background: linear-gradient(135deg, #FCD34D, #F59E0B);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+        
+        .nav-links a {
+            color: #1F2937;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: #374151;
+            transform: translateY(-2px);
+        }
+        
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: #374151;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        
+        .hero-content h1 {
+            font-size: 6rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #ff6b6b, #ffa500, #ff69b4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
+        }
+        
+        .hero-content p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .explore-btn {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .explore-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        /* Section Styles */
+        .section {
+            padding: 80px 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .section-content {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+        
+        .section-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .section-image {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .section h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+        
+        .section p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        
+        /* Tourist Places Section */
+        .tourist-places {
+            background: linear-gradient(135deg, #A7F3D0, #6EE7B7);
+            color: #1F2937;
+        }
+        
+        .image-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+        }
+        
+        .image-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 30px 20px 20px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .image-card:hover .card-overlay {
+            transform: translateY(0);
+        }
+        
+        /* Heritage Hotels Section */
+        .heritage-hotels {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
+        }
+        
+        /* Famous Food Section */
+        .famous-food {
+            background: linear-gradient(135deg, #FDE047, #F59E0B);
+            color: #1F2937;
+        }
+        
+        /* Itinerary Section */
+        .itinerary-section {
+            background: linear-gradient(135deg, #F97316, #EA580C);
+            color: white;
+            text-align: center;
+        }
+        
+        .interest-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+        
+        .interest-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .interest-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+        }
+        
+        .interest-card.selected {
+            border: 4px solid #10B981;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .interest-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .card-content {
+            padding: 20px;
+            text-align: center;
+            color: #1F2937;
+        }
+        
+        .card-content h3 {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .card-content p {
+            font-size: 0.9rem;
+            color: #6B7280;
+            margin-bottom: 15px;
+        }
+        
+        .card-tag {
+            background: #F3F4F6;
+            color: #6B7280;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+        }
+        
+        .generate-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 40px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Itinerary Result Styles */
+        .itinerary-result {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: left;
+        }
+        
+        .itinerary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .export-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .export-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Chat Assistant Styles */
+        .chat-section {
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            color: white;
+        }
+        
+        .chat-container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .message.bot {
+            background: rgba(16, 185, 129, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #10B981;
+        }
+        
+        .message.user {
+            background: rgba(59, 130, 246, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3B82F6;
+            margin-left: 20px;
+        }
+        
+        .message-header {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.9);
+            color: #1F2937;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* Quick Questions */
+        .quick-questions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-question {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-question:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero-content h1 {
+                font-size: 3rem;
+            }
+            
+            .section-content {
+                flex-direction: column;
+                gap: 40px;
+            }
+            
+            .interest-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .export-buttons {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                gap: 15px;
+            }
+            
+            .nav-links a {
+                font-size: 14px;
+            }
+        }
+        
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Scrollbar Styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#tourist-places">Famous Tourist Places</a>
+                <a href="#heritage-hotels">Heritage Hotels</a>
+                <a href="#famous-food">Famous Food</a>
+                <a href="#itinerary">AI Planner</a>
+                <a href="#chat">AI Assistant</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>पधारो म्हारे देश</h1>
+            <p>Padharo Mhare Desh - Welcome to the Pink City</p>
+            <a href="#itinerary" class="explore-btn">🤖 Explore More</a>
+        </div>
+    </section>
+
+    <!-- Famous Tourist Places -->
+    <section id="tourist-places" class="section tourist-places">
+        <div class="section-container">
+            <div class="section-content">
+                <div class="section-text">
+                    <h2>FAMOUS TOURIST PLACES</h2>
+                    <p>Planned by Vidyadhar Bhattacharya, Jaipur holds the distinction of being the first planned city of India. Renowned globally for its coloured gems, the capital city of Rajasthan combines the allure of its ancient history with all the advantages of a metropolis. The bustling modern city is one of the three corners of the golden triangle that includes Delhi, Agra and Jaipur.</p>
+                    <p>The story goes that in 1876, the Prince of Wales visited India on a tour. Since the colour pink was symbolic of hospitality, Maharaja Ram Singh of Jaipur painted the entire city pink. The pink that colours the city makes for a marvellous spectacle to behold.</p>
+                    <a href="#itinerary" class="explore-btn" style="background: rgba(0,0,0,0.1); color: #1F2937; border-color: rgba(0,0,0,0.2);">Explore More</a>
+                </div>
+                <div class="section-image">
+                    <div class="image-card">
+                        <img src="https://images.unsplash.com/photo-1599661046827-dacde6976549?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Amber Fort">
+                        <div class="card-overlay">
+                            <h3 style="font-size: 1.5rem; margin-bottom: 10px;">🏰 Amber Fort</h3>
+                            <p>Magnificent 16th-century fort with stunning architecture</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Heritage Hotels -->
+    <section id="heritage-hotels" class="section heritage-hotels">
+        <div class="section-container">
+            <div class="section-content">
+                <div class="section-image">
+                    <div class="image-card">
+                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Heritage Hotel">
+                        <div class="card-overlay">
+                            <h3 style="font-size: 1.5rem; margin-bottom: 10px;">🏛️ Rambagh Palace</h3>
+                            <p>Former royal residence turned luxury hotel</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-text">
+                    <h2>HERITAGE HOTELS</h2>
+                    <p>Planned by Vidyadhar Bhattacharya, Jaipur holds the distinction of being the first planned city of India. Renowned globally for its coloured gems, the capital city of Rajasthan combines the allure of its ancient history with all the advantages of a metropolis. The bustling modern city is one of the three corners of the golden triangle that includes Delhi, Agra and Jaipur.</p>
+                    <p>The story goes that in 1876, the Prince of Wales visited India on a tour. Since the colour pink was symbolic of hospitality, Maharaja Ram Singh of Jaipur painted the entire city pink. The pink that colours the city makes for a marvellous spectacle to behold.</p>
+                    <a href="#itinerary" class="explore-btn">Explore More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Famous Food -->
+    <section id="famous-food" class="section famous-food">
+        <div class="section-container">
+            <div class="section-content">
+                <div class="section-text">
+                    <h2>FAMOUS FOOD</h2>
+                    <p>Planned by Vidyadhar Bhattacharya, Jaipur holds the distinction of being the first planned city of India. Renowned globally for its coloured gems, the capital city of Rajasthan combines the allure of its ancient history with all the advantages of a metropolis. The bustling modern city is one of the three corners of the golden triangle that includes Delhi, Agra and Jaipur.</p>
+                    <p>The story goes that in 1876, the Prince of Wales visited India on a tour. Since the colour pink was symbolic of hospitality, Maharaja Ram Singh of Jaipur painted the entire city pink. The pink that colours the city makes for a marvellous spectacle to behold.</p>
+                    <a href="#itinerary" class="explore-btn" style="background: rgba(0,0,0,0.1); color: #1F2937; border-color: rgba(0,0,0,0.2);">Explore More</a>
+                </div>
+                <div class="section-image">
+                    <div class="image-card">
+                        <img src="https://images.unsplash.com/photo-1596797038530-2c107229654b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Rajasthani Food">
+                        <div class="card-overlay">
+                            <h3 style="font-size: 1.5rem; margin-bottom: 10px;">🥘 Dal Baati Churma</h3>
+                            <p>Traditional Rajasthani delicacy</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Itinerary Maker -->
+    <section id="itinerary" class="section itinerary-section">
+        <div class="section-container">
+            <h2 style="margin-bottom: 20px;">🤖 AI-Powered Trip Planner</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 40px; opacity: 0.9;">Select your interests and let our AI create a personalized itinerary</p>
+            
+            <!-- Trip Preferences -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px;">
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">📅 Trip Duration</label>
+                    <select id="trip-duration" style="width: 100%; padding: 10px; border-radius: 5px; border: none; background: white; color: #1F2937;">
+                        <option value="1">1 Day</option>
+                        <option value="2" selected>2 Days</option>
+                        <option value="3">3 Days</option>
+                        <option value="4">4 Days</option>
+                        <option value="5">5 Days</option>
+                    </select>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">💰 Budget Range</label>
+                    <select id="budget-range" style="width: 100%; padding: 10px; border-radius: 5px; border: none; background: white; color: #1F2937;">
+                        <option value="budget">Budget (₹2,000-5,000/day)</option>
+                        <option value="mid-range" selected>Mid-Range (₹5,000-10,000/day)</option>
+                        <option value="luxury">Luxury (₹10,000+/day)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
+                <h3 style="font-size: 1.5rem;">From</h3>
+                <h3 style="font-size: 1.5rem;">To</h3>
+            </div>
+            
+            <div class="interest-cards">
+                <div class="interest-card" onclick="toggleCard(this)" data-interest="Heritage Hotels">
+                    <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Heritage Hotels">
+                    <div class="card-content">
+                        <h3>HERITAGE HOTELS</h3>
+                        <p>Royal palaces turned luxury hotels</p>
+                        <span class="card-tag">More Info</span>
+                    </div>
+                </div>
+                
+                <div class="interest-card" onclick="toggleCard(this)" data-interest="Famous Food">
+                    <img src="https://images.unsplash.com/photo-1596797038530-2c107229654b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Famous Food">
+                    <div class="card-content">
+                        <h3>FAMOUS FOOD</h3>
+                        <p>Authentic Rajasthani cuisine</p>
+                        <span class="card-tag">More Info</span>
+                    </div>
+                </div>
+                
+                <div class="interest-card" onclick="toggleCard(this)" data-interest="Famous Places">
+                    <img src="https://images.unsplash.com/photo-1599661046827-dacde6976549?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Famous Places">
+                    <div class="card-content">
+                        <h3>FAMOUS PLACES</h3>
+                        <p>Historical monuments & forts</p>
+                        <span class="card-tag">More Info</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="generate-btn" onclick="generateItinerary()">
+                🚀 Make Itinerary
+            </button>
+
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="loading hidden">
+                <div class="spinner"></div>
+                <p style="font-size: 1.2rem;">🤖 AI is crafting your perfect Jaipur experience...</p>
+            </div>
+
+            <!-- Itinerary Result -->
+            <div id="itinerary-result" class="itinerary-result hidden">
+                <div class="itinerary-header">
+                    <h3 style="font-size: 2rem; margin: 0;">🌟 Your Personalized Jaipur Itinerary</h3>
+                    <div class="export-buttons">
+                        <button class="export-btn" onclick="exportToPDF()">📄 Export PDF</button>
+                        <button class="export-btn" onclick="exportToJSON()">💾 Save Offline</button>
+                        <button class="export-btn" onclick="shareItinerary()">📤 Share</button>
+                    </div>
+                </div>
+                <div id="itinerary-content">
+                    <!-- Generated itinerary content will appear here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Chat Assistant -->
+    <section id="chat" class="section chat-section">
+        <div class="section-container">
+            <h2 style="text-align: center; margin-bottom: 20px;">💬 Ask Jaipur Dost - AI Assistant</h2>
+            <p style="text-align: center; font-

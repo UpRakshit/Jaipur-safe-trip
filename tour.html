@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaipur SafeTrip - Your AI-Powered Travel Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .hero-bg {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect fill="%23D4A574" width="1200" height="800"/><path fill="%23B8956A" d="M600 100L750 300H450z"/><path fill="%23A68660" d="M600 150L700 280H500z"/><rect fill="%23C4A070" x="550" y="300" width="100" height="200"/><rect fill="%23B8956A" x="570" y="320" width="60" height="180"/><circle fill="%23A68660" cx="600" cy="200" r="30"/></svg>');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .selected-card {
+            border: 3px solid #059669;
+            box-shadow: 0 0 20px rgba(5, 150, 105, 0.3);
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #059669;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header/Navbar -->
+    <nav class="bg-yellow-400 py-4 px-6 sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto flex justify-center">
+            <div class="flex space-x-8">
+                <a href="#home" class="text-gray-800 font-semibold hover:text-gray-600 transition-colors">Home</a>
+                <a href="#tourist-places" class="text-gray-800 font-semibold hover:text-gray-600 transition-colors">Famous Tourist Places</a>
+                <a href="#heritage-hotels" class="text-gray-800 font-semibold hover:text-gray-600 transition-colors">Heritage Hotels</a>
+                <a href="#famous-food" class="text-gray-800 font-semibold hover:text-gray-600 transition-colors">Famous Food</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-bg min-h-screen flex items-center justify-center text-white">
+        <div class="text-center">
+            <h1 class="text-6xl md:text-8xl font-bold mb-8 tracking-wide">
+                पधारो म्हारे देश
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 opacity-90">Padharo Mhare Desh</p>
+            <button class="bg-white bg-opacity-20 backdrop-blur-sm text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-opacity-30 transition-all duration-300 border border-white border-opacity-30">
+                Explore More
+            </button>
+        </div>
+    </section>
+
+    <!-- Famous Tourist Places Section -->
+    <section id="tourist-places" class="bg-cyan-200 py-16 px-6">
+        <div class="container mx-auto">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-6">FAMOUS TOURIST PLACES</h2>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        Planned by Vidyadhar Bhattacharya, Jaipur holds the distinction of being the first planned city of India. Renowned globally for its coloured gems, the capital city of Rajasthan combines the allure of its ancient history with all the advantages of a metropolis. The bustling modern city is one of the three corners of the golden triangle that includes Delhi, Agra and Jaipur.
+                    </p>
+                    <p class="text-gray-700 leading-relaxed">
+                        The story goes that in 1876, the Prince of Wales visited India on a tour. Since the colour pink was symbolic of hospitality, Maharaja Ram Singh of Jaipur painted the entire city pink. The pink that colours the city makes for a marvellous spectacle to behold.
+                    </p>
+                    <button class="mt-6 bg-white bg-opacity-70 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-all duration-300">
+                        Explore More
+                    </button>
+                </div>
+                <div class="lg:w-1/2">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                        <div class="h-64 bg-gradient-to-br from-orange-300 to-red-400 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-6xl mb-2">🏰</div>
+                                <p class="text-lg font-semibold">Amber Fort</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Heritage Hotels Section -->
+    <section id="heritage-hotels" class="bg-red-400 py-16 px-6">
+        <div class="container mx-auto">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2 order-2 lg:order-1">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                        <div class="h-64 bg-gradient-to-br from-yellow-300 to-orange-400 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-6xl mb-2">🏛️</div>
+                                <p class="text-lg font-semibold">Rambagh Palace</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 order-1 lg:order-2">
+                    <h2 class="text-4xl font-bold text-white mb-6">HERITAGE HOTELS</h2>
+                    <p class="text-white leading-relaxed mb-4 opacity-90">
+                        Planned by Vidyadhar Bhattacharya, Jaipur holds the distinction of being the first planned city of India. Renowned globally for its coloured gems, the capital city of Rajasthan combines the allure of its ancient history with all the advantages of a metropolis. The bustling modern city is one of the three corners of the golden triangle that includes Delhi, Agra and Jaipur.
+                    </p>
+                    <p class="text-white leading-relaxed opacity-90">
+                        The story goes that in 1876, the Prince of Wales visited India on a tour. Since the colour pink was symbolic of hospitality, Maharaja Ram Singh of Jaipur painted the entire city pink. The pink that colours the city makes for a marvellous spectacle to behold.
+                    </p>
+                    <button class="mt-6 bg-white bg-opacity-20 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-semibold hover:bg-opacity-30 transition-all duration-300 border border-white border-opacity-30">
+                        Explore More
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Famous Food Section -->
+    <section id="famous-food" class="bg-yellow-300 py-16 px-6">
+        <div class="container mx-auto">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-6">FAMOUS FOOD</h2>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        Planned by Vidyadhar Bhattacharya, Jaipur holds the distinction of being the first planned city of India. Renowned globally for its coloured gems, the capital city of Rajasthan combines the allure of its ancient history with all the advantages of a metropolis. The bustling modern city is one of the three corners of the golden triangle that includes Delhi, Agra and Jaipur.
+                    </p>
+                    <p class="text-gray-700 leading-relaxed">
+                        The story goes that in 1876, the Prince of Wales visited India on a tour. Since the colour pink was symbolic of hospitality, Maharaja Ram Singh of Jaipur painted the entire city pink. The pink that colours the city makes for a marvellous spectacle to behold.
+                    </p>
+                    <button class="mt-6 bg-white bg-opacity-70 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-all duration-300">
+                        Explore More
+                    </button>
+                </div>
+                <div class="lg:w-1/2">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                        <div class="h-64 bg-gradient-to-br from-red-400 to-orange-500 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-6xl mb-2">🥘</div>
+                                <p class="text-lg font-semibold">Dal Baati Churma</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Itinerary Maker Section -->
+    <section class="bg-orange-400 py-16 px-6">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-12">
+                <div class="flex justify-center items-center gap-8 mb-8">
+                    <div class="text-center">
+                        <h3 class="text-2xl font-bold text-white mb-2">From</h3>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-2xl font-bold text-white mb-2">To</h3>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <!-- Heritage Hotels Card -->
+                    <div class="interest-card bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105" 
+                         onclick="toggleCard(this, 'heritage-hotels')" data-interest="Heritage Hotels">
+                        <div class="h-48 bg-gradient-to-br from-yellow-300 to-orange-400 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-4xl mb-2">🏛️</div>
+                                <p class="text-lg font-semibold">Heritage Hotels</p>
+                            </div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <p class="text-gray-600 font-medium">HERITAGE HOTELS</p>
+                            <button class="mt-2 bg-gray-100 text-gray-600 px-4 py-2 rounded text-sm">More Info</button>
+                        </div>
+                    </div>
+
+                    <!-- Famous Food Card -->
+                    <div class="interest-card bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105" 
+                         onclick="toggleCard(this, 'famous-food')" data-interest="Famous Food">
+                        <div class="h-48 bg-gradient-to-br from-red-400 to-orange-500 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-4xl mb-2">🥘</div>
+                                <p class="text-lg font-semibold">Famous Food</p>
+                            </div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <p class="text-gray-600 font-medium">FAMOUS FOOD</p>
+                            <button class="mt-2 bg-gray-100 text-gray-600 px-4 py-2 rounded text-sm">More Info</button>
+                        </div>
+                    </div>
+
+                    <!-- Famous Places Card -->
+                    <div class="interest-card bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105" 
+                         onclick="toggleCard(this, 'famous-places')" data-interest="Famous Places">
+                        <div class="h-48 bg-gradient-to-br from-orange-300 to-red-400 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-4xl mb-2">🏰</div>
+                                <p class="text-lg font-semibold">Famous Places</p>
+                            </div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <p class="text-gray-600 font-medium">FAMOUS PLACES</p>
+                            <button class="mt-2 bg-gray-100 text-gray-600 px-4 py-2 rounded text-sm">More Info</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="generateItinerary()" 
+                        class="bg-white bg-opacity-20 backdrop-blur-sm text-white px-12 py-4 rounded-lg text-xl font-bold hover:bg-opacity-30 transition-all duration-300 border-2 border-white border-opacity-30 shadow-lg">
+                    Make Itinerary
+                </button>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="hidden text-center py-8">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <p class="text-white text-lg">Generating your personalized itinerary...</p>
+            </div>
+
+            <!-- Itinerary Result -->
+            <div id="itinerary-result" class="mt-8 bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 text-white hidden">
+                <!-- AI-generated itinerary will appear here -->
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let selectedInterests = new Set();
+
+        function toggleCard(cardElement, interestId) {
+            const interest = cardElement.dataset.interest;
+            
+            if (selectedInterests.has(interest)) {
+                selectedInterests.delete(interest);
+                cardElement.classList.remove('selected-card');
+            } else {
+                selectedInterests.add(interest);
+                cardElement.classList.add('selected-card');
+            }
+        }
+
+        async function generateItinerary() {
+            // Show loading indicator
+            document.getElementById('loading-indicator').classList.remove('hidden');
+            document.getElementById('itinerary-result').classList.add('hidden');
+
+            // Check if user has selected any interests
+            if (selectedInterests.size === 0) {
+                alert('Please select at least one interest before generating an itinerary!');
+                document.getElementById('loading-indicator').classList.add('hidden');
+                return;
+            }
+
+            // Convert selected interests to array
+            const interestsArray = Array.from(selectedInterests);
+            
+            // Construct the Golden Prompt
+            const prompt = `You are 'Jaipur Dost,' an expert tour guide for foreign tourists in Jaipur, specializing in safety and fair pricing. Your task is to generate a detailed, 2-day travel itinerary based on the user's selected interests. For every location or activity, you MUST include a '💡 **Safety & Insider Note**' with tips about fair prices, scams to avoid, or a useful phrase in Hindi. The user is interested in: ${interestsArray.join(', ')}.
+
+Please format your response in HTML with proper headings, bullet points, and styling. Make it comprehensive and practical for foreign tourists visiting Jaipur.`;
+
+            try {
+                // Note: Replace 'YOUR_API_KEY' with an actual Google Gemini API key
+                const API_KEY = 'YOUR_API_KEY'; // Users need to replace this with their actual API key
+                
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const generatedText = data.candidates[0].content.parts[0].text;
+
+                // Hide loading indicator and show result
+                document.getElementById('loading-indicator').classList.add('hidden');
+                document.getElementById('itinerary-result').classList.remove('hidden');
+                document.getElementById('itinerary-result').innerHTML = `
+                    <h3 class="text-2xl font-bold mb-4 text-center">🌟 Your Personalized Jaipur Itinerary</h3>
+                    <div class="prose prose-invert max-w-none">
+                        ${generatedText.replace(/\n/g, '<br>')}
+                    </div>
+                `;
+
+                // Scroll to result
+                document.getElementById('itinerary-result').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+
+            } catch (error) {
+                console.error('Error generating itinerary:', error);
+                
+                // Hide loading indicator
+                document.getElementById('loading-indicator').classList.add('hidden');
+                
+                // Show error message or fallback content
+                document.getElementById('itinerary-result').classList.remove('hidden');
+                document.getElementById('itinerary-result').innerHTML = `
+                    <h3 class="text-2xl font-bold mb-4 text-center">🌟 Your Personalized Jaipur Itinerary</h3>
+                    <div class="text-center mb-6">
+                        <p class="text-red-200 mb-4">⚠️ API connection failed. Here's a sample itinerary based on your interests:</p>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                            <h4 class="text-xl font-bold mb-3">📅 Day 1</h4>
+                            <ul class="space-y-2 text-sm">
+                                <li><strong>Morning (9:00 AM):</strong> Visit Amber Fort - Take elephant ride or jeep</li>
+                                <li class="text-yellow-200">💡 <strong>Safety & Insider Note:</strong> Elephant rides cost ₹1,100 per person. Negotiate jeep rides for ₹400-500. Say "Bhaiya, thoda kam kar do" (Brother, please reduce the price).</li>
+                                <li><strong>Afternoon (1:00 PM):</strong> Lunch at traditional Rajasthani restaurant</li>
+                                <li><strong>Evening (4:00 PM):</strong> Explore City Palace and Jantar Mantar</li>
+                                <li class="text-yellow-200">💡 <strong>Safety & Insider Note:</strong> Combined ticket costs ₹700. Avoid guides who approach you outside - official guides wear badges.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                            <h4 class="text-xl font-bold mb-3">📅 Day 2</h4>
+                            <ul class="space-y-2 text-sm">
+                                <li><strong>Morning (9:00 AM):</strong> Hawa Mahal and local markets</li>
+                                <li class="text-yellow-200">💡 <strong>Safety & Insider Note:</strong> Entry fee is ₹50. Best photos from the street opposite. In markets, start bargaining at 30% of quoted price.</li>
+                                <li><strong>Afternoon (2:00 PM):</strong> Heritage hotel experience and local cuisine</li>
+                                <li><strong>Evening (5:00 PM):</strong> Sunset at Nahargarh Fort</li>
+                                <li class="text-yellow-200">💡 <strong>Safety & Insider Note:</strong> Auto-rickshaw to fort costs ₹200-300. Return by 7 PM for safety. Try "Dal Baati Churma" at local eateries.</li>
+                            </ul>
+                        </div>
+                        <div class="text-center mt-6 p-4 bg-green-500 bg-opacity-20 rounded-lg">
+                            <p class="font-semibold">🔑 <strong>Pro Tip:</strong> Always carry water, wear comfortable shoes, and keep emergency contacts handy!</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Scroll to result
+                document.getElementById('itinerary-result').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
